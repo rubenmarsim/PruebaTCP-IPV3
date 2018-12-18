@@ -10,18 +10,23 @@ namespace Server
 {
     class Server
     {
+        #region Variables e instancias globales
+        static TcpListener _Listener;
+        static TcpClient _Client;
+        static NetworkStream _NS;
+        const int _Port = 21;
+        #endregion
+
+        #region Main
         static void Main(string[] args)
         {
-            //Instanciamos el server
-            TcpListener Listener = new TcpListener(IPAddress.Any, 21);
-            //lo iniciamos
-            Listener.Start();
+            IniciarServer();
 
             //Creamos un socket de tipo TCPClient preparado para enviar y recibir info
-            TcpClient client = Listener.AcceptTcpClient();
+            _Client = _Listener.AcceptTcpClient();
 
             //Creamos el NetworkStream asociado al client
-            NetworkStream NS = client.GetStream();
+            _NS = _Client.GetStream();
             //Dimensionamos el buffer
             byte[] buffer = new byte[1024];
 
@@ -30,14 +35,38 @@ namespace Server
             byte[] nouBuffer = Encoding.ASCII.GetBytes("Hola soy el server");
             //le decimos al NetworkStream que printee lo del nuevo buffer, y le pasamos
             //los demas parametros que necesita
-            NS.Write(nouBuffer, 0, nouBuffer.Length);
+            _NS.Write(nouBuffer, 0, nouBuffer.Length);
 
             Console.WriteLine(nouBuffer);
+
+
             Console.ReadKey();
-            //Paramos el server
-            NS.Close();
-            client.Close();
-            Listener.Stop();
+
+            ApagarServer();            
         }
+        #endregion
+
+        #region Metodos
+        /// <summary>
+        /// Instanciamos e iniciamos el server
+        /// </summary>
+        private static void IniciarServer()
+        {
+            //Instanciamos el server
+            _Listener = new TcpListener(IPAddress.Any, _Port);
+            //lo iniciamos
+            _Listener.Start();
+        }
+
+        /// <summary>
+        /// Paramos el server
+        /// </summary>
+        private static void ApagarServer()
+        {
+            _NS.Close();
+            _Client.Close();
+            _Listener.Stop();
+        }
+        #endregion
     }
 }
