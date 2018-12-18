@@ -16,6 +16,7 @@ namespace Server
         static NetworkStream _NS;
         const int _Port = 21;
         static string _ServerMessage = "Hola soy el server";
+        static string _Resposta = string.Empty;
         #endregion
 
         #region Main
@@ -26,6 +27,8 @@ namespace Server
             Instances();
 
             Conversion_Send();
+
+            ReciveRespuesta();
 
             Printar();
 
@@ -76,13 +79,20 @@ namespace Server
             _NS.Write(nouBuffer, 0, nouBuffer.Length);
         }
 
+        private static void ReciveRespuesta()
+        {
+            var dadaResposta = new byte[256];
+            Int32 bytes = _NS.Read(dadaResposta, 0, dadaResposta.Length);
+            _Resposta = Encoding.ASCII.GetString(dadaResposta, 0, bytes);
+        }
+
         /// <summary>
         /// Printamos todo lo que vamos a enviar y lo que recibimos
         /// </summary>
         private static void Printar()
         {
             //Printamos el mensaje que recibimos del cliente
-            Console.WriteLine("Recibes: {0}", "");
+            Console.WriteLine("Recibes: {0}", _Resposta);
             //Printamos el mensaje que recibimos del server
             Console.WriteLine("Envias: {0}", _ServerMessage);
         }
