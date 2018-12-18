@@ -14,37 +14,68 @@ namespace Cliente
         static NetworkStream _NS;
         const string _ServerIP = "127.0.0.1";
         const int _Port = 21;
+        static string _ClientMessage = "Hola soy el cliente";
+        static string _Resposta = string.Empty;
         #endregion
 
         #region Main
         static void Main(string[] args)
         {
-            //Creamos el TCPClient asociado el server
-            _Client = new TcpClient(_ServerIP, _Port);
+            Instances();
 
-            //Convertimos un mensaje a un array de bytes
-            byte[] dades = Encoding.ASCII.GetBytes("Hola soy el cliente");
+            Send();
 
-            //Instanciamos un NetworkStream para leer y escribir a partir de GetStream
-            _NS = _Client.GetStream();
+            ReciveRespuesta();
 
-            //Enviamos el mensaje al server
-            _NS.Write(dades, 0, dades.Length);
-
-            //Preparamos el socket para que escuche la respuesta del server
-            var dadaResposta = new byte[256];
-            string resposta = string.Empty;
-            Int32 bytes = _NS.Read(dadaResposta, 0, dadaResposta.Length);
-            resposta = Encoding.ASCII.GetString(dadaResposta, 0, bytes);
-            Console.WriteLine(resposta);
-
+            Printar();
 
             Console.ReadKey();
         }
         #endregion
 
         #region Metodos
+        /// <summary>
+        /// Instanciamos el TCPClient y el NetworkStream
+        /// </summary>
+        private static void Instances()
+        {
+            //Creamos el TCPClient asociado el server
+            _Client = new TcpClient(_ServerIP, _Port);
 
+            //Instanciamos un NetworkStream para leer y escribir a partir de GetStream
+            _NS = _Client.GetStream();
+        }
+
+        /// <summary>
+        /// Convertimos los datos y los mandamos
+        /// </summary>
+        private static void Send()
+        {
+            //Convertimos un mensaje a un array de bytes
+            byte[] dades = Encoding.ASCII.GetBytes(_ClientMessage);
+
+            //Enviamos el mensaje al server
+            _NS.Write(dades, 0, dades.Length);
+        }
+
+        /// <summary>
+        /// Printamos todo lo que vamos a enviar y lo que recibimos
+        /// </summary>
+        private static void Printar()
+        {
+            Console.WriteLine("Envias: {0}", _ClientMessage);
+            Console.WriteLine("Recibes: {0}", _Resposta);
+        }
+
+        /// <summary>
+        /// Preparamos el socket para que escuche la respuesta del server
+        /// </summary>
+        private static void ReciveRespuesta()
+        {            
+            var dadaResposta = new byte[256];
+            Int32 bytes = _NS.Read(dadaResposta, 0, dadaResposta.Length);
+            _Resposta = Encoding.ASCII.GetString(dadaResposta, 0, bytes);
+        }
         #endregion
     }
 }

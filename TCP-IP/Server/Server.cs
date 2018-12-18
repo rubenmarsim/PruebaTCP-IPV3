@@ -15,6 +15,7 @@ namespace Server
         static TcpClient _Client;
         static NetworkStream _NS;
         const int _Port = 21;
+        static string _ServerMessage = "Hola soy el server";
         #endregion
 
         #region Main
@@ -22,23 +23,11 @@ namespace Server
         {
             IniciarServer();
 
-            //Creamos un socket de tipo TCPClient preparado para enviar y recibir info
-            _Client = _Listener.AcceptTcpClient();
+            Instances();
 
-            //Creamos el NetworkStream asociado al client
-            _NS = _Client.GetStream();
-            //Dimensionamos el buffer
-            byte[] buffer = new byte[1024];
+            Conversion_Send();
 
-            //Creamos un nuevo buffer, el cual usaremos para enviar datos,
-            //y lo llenamos
-            byte[] nouBuffer = Encoding.ASCII.GetBytes("Hola soy el server");
-            //le decimos al NetworkStream que printee lo del nuevo buffer, y le pasamos
-            //los demas parametros que necesita
-            _NS.Write(nouBuffer, 0, nouBuffer.Length);
-
-            Console.WriteLine(nouBuffer);
-
+            Printar();
 
             Console.ReadKey();
 
@@ -54,8 +43,48 @@ namespace Server
         {
             //Instanciamos el server
             _Listener = new TcpListener(IPAddress.Any, _Port);
-            //lo iniciamos
+            //Lo iniciamos
             _Listener.Start();
+        }
+
+        /// <summary>
+        /// Preparamos el socket para poder enviar y recibir info y redimensionamos el buffer
+        /// </summary>
+        private static void Instances()
+        {
+            //Creamos un socket de tipo TCPClient preparado para enviar y recibir info
+            _Client = _Listener.AcceptTcpClient();
+            //Creamos el NetworkStream asociado al client
+            _NS = _Client.GetStream();
+            //Dimensionamos el buffer
+            byte[] buffer = new byte[1024];
+            
+        }
+
+        /// <summary>
+        /// Hacemos la conversion y el envio de los datos
+        /// </summary>
+        private static void Conversion_Send()
+        {
+            //Creamos un nuevo buffer, el cual usaremos para enviar datos,
+            //y lo llenamos con el mensaje creado previamente, ademas pasamos
+            //el mensaje a bytes
+            byte[] nouBuffer = Encoding.ASCII.GetBytes(_ServerMessage);
+
+            //le decimos al NetworkStream que envie lo del nuevo buffer, y le pasamos
+            //los demas parametros que necesita
+            _NS.Write(nouBuffer, 0, nouBuffer.Length);
+        }
+
+        /// <summary>
+        /// Printamos todo lo que vamos a enviar y lo que recibimos
+        /// </summary>
+        private static void Printar()
+        {
+            //Printamos el mensaje que recibimos del cliente
+            Console.WriteLine("Recibes: {0}", "");
+            //Printamos el mensaje que recibimos del server
+            Console.WriteLine("Envias: {0}", _ServerMessage);
         }
 
         /// <summary>
@@ -63,8 +92,11 @@ namespace Server
         /// </summary>
         private static void ApagarServer()
         {
+            //Cerramos el NetworkStream
             _NS.Close();
+            //Cerramos el TCPClient
             _Client.Close();
+            //Paramos el TCPListener
             _Listener.Stop();
         }
         #endregion
