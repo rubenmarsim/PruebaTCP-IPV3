@@ -17,6 +17,7 @@ namespace Server
         const int _Port = 21;
         static string _ServerMessage = "Hola soy el server";
         static string _Resposta = string.Empty;
+        static string _RespostaUser = string.Empty;
         #endregion
 
         #region Main
@@ -84,6 +85,10 @@ namespace Server
             var dadaResposta = new byte[256];
             Int32 bytes = _NS.Read(dadaResposta, 0, dadaResposta.Length);
             _Resposta = Encoding.ASCII.GetString(dadaResposta, 0, bytes);
+
+            var dadaResposta2 = new byte[256];
+            Int32 bytes2 = _NS.Read(dadaResposta2, 0, dadaResposta2.Length);
+            _RespostaUser = Encoding.ASCII.GetString(dadaResposta2, 0, bytes2);
         }
 
         /// <summary>
@@ -91,6 +96,9 @@ namespace Server
         /// </summary>
         private static void Printar()
         {
+            Console.WriteLine("Recibes del Usuario: {0}", _RespostaUser);
+
+
             //Printamos el mensaje que recibimos del cliente
             Console.WriteLine("Recibes: {0}", _Resposta);
             //Printamos el mensaje que recibimos del server

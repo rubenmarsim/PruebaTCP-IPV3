@@ -16,12 +16,15 @@ namespace Cliente
         const int _Port = 21;
         static string _ClientMessage = "Hola soy el cliente";
         static string _Resposta = string.Empty;
+        static string _UserMessage = "";
         #endregion
 
         #region Main
         static void Main(string[] args)
         {
             Instances();
+
+            GetUserMessage();
 
             Send();
 
@@ -56,6 +59,9 @@ namespace Cliente
 
             //Enviamos el mensaje al server
             _NS.Write(dades, 0, dades.Length);
+
+            byte[] dades2 = Encoding.ASCII.GetBytes(_UserMessage);
+            _NS.Write(dades2, 0, dades2.Length);
         }
 
         /// <summary>
@@ -65,6 +71,7 @@ namespace Cliente
         {
             Console.WriteLine("Envias: {0}", _ClientMessage);
             Console.WriteLine("Recibes: {0}", _Resposta);
+            
         }
 
         /// <summary>
@@ -75,6 +82,12 @@ namespace Cliente
             var dadaResposta = new byte[256];
             Int32 bytes = _NS.Read(dadaResposta, 0, dadaResposta.Length);
             _Resposta = Encoding.ASCII.GetString(dadaResposta, 0, bytes);
+        }
+
+        private static void GetUserMessage()
+        {
+            Console.Write("Envia: ");
+            _UserMessage = Console.ReadLine();
         }
         #endregion
     }
